@@ -20,7 +20,8 @@ class PoEHatDevice:
         self._fan_control = fan_control
 
     def update_fan(self):
-        self._i2c.write_byte(self._address, self._fan_control.mode().op(self._i2c.read_byte(self._address)))
+        if self._fan_control.has_changed():
+            self._i2c.write_byte(self._address, self._fan_control.mode().op(self._i2c.read_byte(self._address)))
 
     @staticmethod
     def clear():
