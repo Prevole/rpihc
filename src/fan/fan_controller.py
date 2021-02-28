@@ -1,23 +1,33 @@
+from enum import Enum
+
 from bitarray import bitarray
 
-from src.poe_hat.data_collector import DataCollector
-from src.poe_hat.fan_mode import FanMode
+from src.config import Config
+from src.data.base_data import BaseData
+from src.data.oberserver import Observer
+from src.data.poller import Histos, HistoType
 
 
-class FanControl:
-    def __init__(self, threshold, data_collector: DataCollector, samples=10):
+class FanMode(Enum):
+    OFF = ('off', lambda x: 0x01 | x)
+    ON = ('on', lambda x: 0xFE & x)
+
+    def __init__(self, text, op):
+        self.text = text
+        self.op = op
+
+
+class FanController(Observer):
+    def __init__(self, threshold, samples=Config.fan_default_samples):
         self._state = FanTimeState(time=samples)
         self._mode = FanMode.OFF
         self._threshold = threshold
-        self._data_collector = data_collector
 
     def mode(self):
         return self._state.mode()
 
-    def update(self):
-        self._state.update(self._data_collector.temperature() > self._threshold)
-
-        # self._mode = FanMode.OFF if self._data_collector.temperature() < self._threshold else FanMode.ON
+    def notify(self, data: BaseData, histos: Histos):
+        self._state.update(histos.histo(HistoType.TEMPERATURE).current() > self._threshold)
 
     def has_changed(self):
         return self._state.has_changed()

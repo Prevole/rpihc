@@ -1,3 +1,6 @@
+numpy
 pillow
 bitarray
+psutil
 smbus
+spidev

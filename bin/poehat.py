@@ -36,8 +36,8 @@ args = parser.parse_args()
 data_collector = DataCollector()
 fan_control = FanControl(threshold=args.threshold, samples=args.grace_period, data_collector=data_collector)
 drawer = PoEHatImageDrawer(
-    width=DISPLAY.width,
-    height=DISPLAY.height,
+    width=DISPLAY._width,
+    height=DISPLAY._height,
     data_collector=data_collector,
     fan_control=fan_control
 )
